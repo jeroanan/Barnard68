@@ -1,0 +1,85 @@
+#!/usr/bin/env racket
+#lang racket/base
+
+(require racket/list)
+(require racket/port)
+(require racket/string)
+
+(require json)
+
+(define (text/gemini-header code)
+  (format "~A text/gemini\r\n" code))
+  
+(define (display-ok-header)
+  (display (text/gemini-header 20)))
+
+(define (not-found)
+  (display "40 Not found\r\n"))
+
+(define (internal-error msg)
+  (display (format "50 ~A\r\n" msg)))
+
+(define (file->jsexpr path)
+  (define in (open-input-file path))
+  (define jsexpr (string->jsexpr (port->string in)))
+  (close-input-port in)
+  jsexpr)
+
+(define (get-article name)
+  ;; Read article file
+  (define article-json (file->jsexpr "root/article.txt"))
+  (define query-obj (hash-ref article-json 'query))
+  (define pages-obj (hash-ref query-obj 'pages))
+  (define num-obj (hash-ref pages-obj (first (hash-keys pages-obj))))
+
+  (define title (hash-ref num-obj 'title))
+  (define article (hash-ref num-obj 'extract))
+
+  (display-ok-header)
+  (display (format "~A\n\n" title))
+  (display article))
+
+(define (search search-term)
+  (define search-json (file->jsexpr "root/search_result.txt"))
+  (define received-search-term (first search-json))
+  (define search-results (second search-json))
+
+  (display-ok-header)
+  (display (format "Search results for \"~A\"\n\n\n" search-term))
+  (for ([sr search-results])
+    (display (format "~A\n\n" sr))))
+
+(define (neq? p1 p2)
+  (not (eq? p1 p2)))
+
+(define (query-string->hashtable qs)
+  (define ht (make-hash))
+  (define entries (string-split qs "&"))
+  (for ([e entries])
+    (define kv (string-split e "="))
+    (hash-set!
+     ht
+     (first kv)
+     (if (> (length kv) 1) (second kv) "")))
+  ht)
+                   
+(define (dispatch query-string)
+  (define query-entries (query-string->hashtable query-string))
+
+  (define (has-key? k)
+    (hash-has-key? query-entries k))
+
+  (define (get-val k)
+    (hash-ref query-entries k))
+  
+  (cond
+    [(has-key? "search") (search (get-val "search"))]
+    [(has-key? "article") (get-article (get-val "article"))]
+    [else (not-found)])
+  (void))
+
+(define qs (getenv "QUERY_STRING"))
+
+(if (eq? qs "")
+  (not-found)
+  (dispatch qs))
