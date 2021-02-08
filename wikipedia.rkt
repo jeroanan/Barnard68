@@ -48,6 +48,7 @@
   (define article (hash-ref num-obj 'extract))
 
   (display-ok-header)
+  (display (gemini-link-line "/wikipedia.rkt" "Search"))
   (display (gemini-title (format "~A" title)))
   (display article))
 
@@ -61,7 +62,8 @@
   (display-ok-header)
   (display (gemini-title (format "Search results for \"~A\"" search-term)))
   (for ([sr search-results])
-    (display (gemini-link-line (format "/wikipedia.rkt?article=~A" (uri-encode sr)) sr))))
+    (display (gemini-link-line (format "/wikipedia.rkt?article=~A" (uri-encode sr)) sr)))
+  (display (gemini-link-line "/wikipedia.rkt" "\n\nSearch"))
 
 (define (default qs-dict)
   (if (eq? (string-length qs) 0)
