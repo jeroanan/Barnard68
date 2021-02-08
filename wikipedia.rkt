@@ -63,7 +63,8 @@
   (display (gemini-title (format "Search results for \"~A\"" search-term)))
   (for ([sr search-results])
     (display (gemini-link-line (format "/wikipedia.rkt?article=~A" (uri-encode sr)) sr)))
-  (display (gemini-link-line "/wikipedia.rkt" "\n\nSearch"))
+  (display "\n\n")
+  (display (gemini-link-line "/wikipedia.rkt" "Search")))
 
 (define (default qs-dict)
   (if (eq? (string-length qs) 0)
