@@ -4,6 +4,8 @@
 (require racket/list)
 (require racket/port)
 (require racket/string)
+(require net/http-client)
+(require net/uri-codec)
 
 (require json)
 
@@ -25,9 +27,13 @@
   (close-input-port in)
   jsexpr)
 
+(define (wikipedia-get-jsexpr-from-path path)
+  (define-values (status headers response-port) (http-sendrecv "en.wikipedia.org" path #:ssl? #t))
+  (string->jsexpr (port->string response-port)))
+
 (define (get-article name)
-  ;; Read article file
-  (define article-json (file->jsexpr "root/article.txt"))
+  (define article-path (format "/w/api.php?action=query&format=json&titles=~A&prop=extracts&explaintext" name))
+  (define article-json (wikipedia-get-jsexpr-from-path article-path));(file->jsexpr "root/article.txt"))
   (define query-obj (hash-ref article-json 'query))
   (define pages-obj (hash-ref query-obj 'pages))
   (define num-obj (hash-ref pages-obj (first (hash-keys pages-obj))))
@@ -40,7 +46,9 @@
   (display article))
 
 (define (search search-term)
-  (define search-json (file->jsexpr "root/search_result.txt"))
+  (define search-path (format "/w/api.php?action=opensearch&search=~A" search-term))
+
+  (define search-json (wikipedia-get-jsexpr-from-path search-path))
   (define received-search-term (first search-json))
   (define search-results (second search-json))
 
@@ -80,6 +88,5 @@
 
 (define qs (getenv "QUERY_STRING"))
 
-(if (eq? qs "")
-  (not-found)
+(when (not (eq? qs #f))
   (dispatch qs))
