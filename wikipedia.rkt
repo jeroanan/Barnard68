@@ -9,6 +9,8 @@
 
 (require json)
 
+(define script-root (getenv "SCRIPT_NAME"))
+
 (define (text/gemini-header code)
   (format "~A text/gemini\r\n" code))
   
@@ -48,7 +50,7 @@
   (define article (hash-ref num-obj 'extract))
 
   (display-ok-header)
-  (display (gemini-link-line "/wikipedia.rkt" "Search"))
+  (display (gemini-link-line (format "/~A" script-root) "Search"))
   (display (gemini-title (format "~A" title)))
   (display article))
 
@@ -62,9 +64,9 @@
   (display-ok-header)
   (display (gemini-title (format "Search results for \"~A\"" search-term)))
   (for ([sr search-results])
-    (display (gemini-link-line (format "/wikipedia.rkt?article=~A" (uri-encode sr)) sr)))
+    (display (gemini-link-line (format "/~A?article=~A" script-root (uri-encode sr)) sr)))
   (display "\n\n")
-  (display (gemini-link-line "/wikipedia.rkt" "Search")))
+  (display (gemini-link-line (format "/~A" script-root) "Search")))
 
 (define (default qs-dict)
   (if (eq? (string-length qs) 0)
