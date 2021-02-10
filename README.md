@@ -9,7 +9,9 @@ I may add more scripts to act as API gateways to other places later.
 You need a Gemini server that can run CGI scripts. I have developed and tested this using dezhemini, as I really enjoy Racket. The Wikipedia script offers three urls:
 
 / -- Gives a search prompt
+
 /search?<search_term> -- Searches Wikipedia for the given search term and presents the results as links
+
 /article?<article_name> -- Displays the article
 
 # Gemini Link
