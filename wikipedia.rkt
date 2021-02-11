@@ -1,6 +1,7 @@
 #!/usr/bin/env racket
 #lang racket/base
 
+(require racket/bool)
 (require racket/list)
 (require racket/port)
 (require racket/string)
@@ -33,6 +34,28 @@
 (define (display-search-link)
   (display (gemini-link-line (format "/~A" script-root) "Search")))
 
+(define (process-subheading l pattern fmt)
+  (if (false? (regexp-match pattern l))
+      l
+      (format fmt (string-replace l "=" ""))))
+
+(define (process-subheading-1 l)
+  (process-subheading l #rx"== .* ==$" "## ~A"))
+
+(define (process-subheading-2 l)
+  (process-subheading l #rx"=== .* ===$" "## ~A"))
+
+(define (process-line l)
+  (define (loop l fs)
+    (if (empty? fs)
+        l
+        (loop ((first fs) l) (rest fs))))
+
+  (define fs (list
+               process-subheading-1
+               process-subheading-2))
+  (loop l fs))
+
 (define (get-article name)
   (define article-path (format "/w/api.php?action=query&format=json&titles=~A&prop=extracts&explaintext" name))
   (define article-json (wikipedia-get-jsexpr-from-path article-path))
@@ -42,11 +65,16 @@
   
   (define title (hash-ref num-obj 'title))
   (define article (hash-ref num-obj 'extract))
+  (define article-lines 
+    (string-join
+      (map 
+        process-line
+      (string-split article "\n")) "\n"))
 
   (display-ok-header)
   (display-search-link)
   (display (gemini-title (format "~A" title)))
-  (display article))
+  (display article-lines))
 
 (define (search search-term)
   (define search-path (format "/w/api.php?action=opensearch&search=~A" search-term))
