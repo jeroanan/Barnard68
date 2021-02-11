@@ -17,17 +17,8 @@
 (define (display-ok-header)
   (display (text/gemini-header 20)))
 
-(define (not-found)
-  (display "40 Not found\r\n"))
-
 (define (internal-error msg)
   (display (format "50 ~A\r\n" msg)))
-
-(define (file->jsexpr path)
-  (define in (open-input-file path))
-  (define jsexpr (string->jsexpr (port->string in)))
-  (close-input-port in)
-  jsexpr)
 
 (define (gemini-link-line url friendly-name)
   (format "=> ~A ~A\n\n" url friendly-name))
@@ -39,18 +30,21 @@
   (define-values (status headers response-port) (http-sendrecv "en.wikipedia.org" path #:ssl? #t))
   (string->jsexpr (port->string response-port)))
 
+(define (display-search-link)
+  (display (gemini-link-line (format "/~A" script-root) "Search")))
+
 (define (get-article name)
   (define article-path (format "/w/api.php?action=query&format=json&titles=~A&prop=extracts&explaintext" name))
   (define article-json (wikipedia-get-jsexpr-from-path article-path))
   (define query-obj (hash-ref article-json 'query))
   (define pages-obj (hash-ref query-obj 'pages))
   (define num-obj (hash-ref pages-obj (first (hash-keys pages-obj))))
-
+  
   (define title (hash-ref num-obj 'title))
   (define article (hash-ref num-obj 'extract))
 
   (display-ok-header)
-  (display (gemini-link-line (format "/~A" script-root) "Search"))
+  (display-search-link)
   (display (gemini-title (format "~A" title)))
   (display article))
 
@@ -63,6 +57,8 @@
 
   (display-ok-header)
   (display (gemini-title (format "Search results for \"~A\"" search-term)))
+  (display-search-link)
+
   (for ([sr search-results])
     (display (gemini-link-line (format "/~A?article=~A" script-root (uri-encode sr)) sr)))
   (display "\n\n")
@@ -110,4 +106,3 @@
 (if (or (eq? qs #f) (eq? (string-length qs) 0))
     (default "")
     (dispatch qs))
-
