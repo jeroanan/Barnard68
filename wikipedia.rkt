@@ -1,38 +1,21 @@
 #!/usr/bin/env racket
-#lang racket/base
+#lang s-exp "barnard68.rkt"
 
 (require racket/bool)
 (require racket/list)
-(require racket/port)
 (require racket/string)
-(require net/http-client)
 (require net/uri-codec)
 
-(require json)
-
-(define script-root (getenv "SCRIPT_NAME"))
-
-(define (text/gemini-header code)
-  (format "~A text/gemini\r\n" code))
-  
-(define (display-ok-header)
-  (display (text/gemini-header 20)))
+(define base-url "en.wikipedia.org")
 
 (define (internal-error msg)
   (display (format "50 ~A\r\n" msg)))
 
-(define (gemini-link-line url friendly-name)
-  (format "=> ~A ~A\n\n" url friendly-name))
-
-(define (gemini-title title-text)
-  (format "# ~A\n\n" title-text))
-
 (define (wikipedia-get-jsexpr-from-path path)
-  (define-values (status headers response-port) (http-sendrecv "en.wikipedia.org" path #:ssl? #t))
-  (string->jsexpr (port->string response-port)))
+  (get-jsexpr-from-url base-url path))
 
 (define (display-search-link)
-  (display (gemini-link-line (format "/~A" script-root) "Search")))
+  (gemini-link (format "/~A" (get-script-root)) "Search"))
 
 (define (process-subheading l pattern fmt)
   (if (false? (regexp-match pattern l))
@@ -73,7 +56,7 @@
 
   (display-ok-header)
   (display-search-link)
-  (display (gemini-title (format "~A" title)))
+  (gemini-title (format "~A" title))
   (display article-lines))
 
 (define (search search-term)
@@ -84,13 +67,13 @@
   (define search-results (second search-json))
 
   (display-ok-header)
-  (display (gemini-title (format "Search results for \"~A\"" search-term)))
+  (gemini-title (format "Search results for \"~A\"" search-term))
   (display-search-link)
 
   (for ([sr search-results])
-    (display (gemini-link-line (format "/~A?article=~A" script-root (uri-encode sr)) sr)))
+    (gemini-link (format "/~A?article=~A" (get-script-root) (uri-encode sr)) sr))
   (display "\n\n")
-  (display (gemini-link-line (format "/~A" script-root) "Search")))
+  (gemini-link (format "/~A" (get-script-root)) "Search"))
 
 (define (default qs-dict)
   (if (eq? (string-length qs) 0)
