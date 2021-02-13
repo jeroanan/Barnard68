@@ -48,3 +48,5 @@
   (for ([id story-ids])
     (let ([i (get-item db-conn id)])
       (gemini-link (item-url i) (item-title i)))))
+
+(get-top-stories)
