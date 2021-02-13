@@ -1,3 +1,4 @@
+#!/usr/bin/env racket
 #lang s-exp "barnard68.rkt"
 
 (require racket/bool)
