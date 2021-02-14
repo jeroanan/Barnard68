@@ -14,6 +14,9 @@ Getting the top stories consists of two steps:
 * /v0/item/<itemid>.json is called for each id returned by the previous
   call to get story title and URL
 
+The output of /v0/beststories is cached in the sqlite database and only
+goes to the URL when the cache expires (by default, after one hour).
+
 The initial call to /v0/beststories.json returns, according to the API
 documentation, a list of up to 500 item Ids. I have found that it’s more
 like 200, but regardles /v0/item must then be called for each individual
