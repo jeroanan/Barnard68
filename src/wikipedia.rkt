@@ -1,18 +1,29 @@
 #!/usr/bin/env racket
 #lang s-exp "barnard68.rkt"
 
+(provide default
+         dispatch
+         search
+         get-article
+         base-url
+         (all-from-out "barnard68.rkt")
+         (all-from-out racket/bool))
+
 (require racket/bool)
 (require racket/list)
 (require racket/string)
 (require net/uri-codec)
 
-(define base-url "en.wikipedia.org")
+;; This base-url is the only thing that makes this a script for wikipedia.org and not some other mediawiki site that
+;; also has its API enabled. So it makes sense that this file doubles up as a module language so we can also easily
+;; provide gateways for sites such as wiktionary.
+(define base-url (make-parameter "en.wikipedia.org"))
 
 (define (internal-error msg)
   (display (format "50 ~A\r\n" msg)))
 
 (define (wikipedia-get-jsexpr-from-path path)
-  (get-jsexpr-from-url base-url path))
+  (get-jsexpr-from-url (base-url) path))
 
 (define (display-search-link)
   (gemini-link (format "/~A" (get-script-root)) "Search"))
@@ -114,6 +125,7 @@
 
 (define qs (getenv "QUERY_STRING"))
 
-(if (or (eq? qs #f) (eq? (string-length qs) 0))
-    (default "")
-    (dispatch qs))
+(when (not (false? qs))
+  (if (eq? (string-length qs) 0)
+      (default "")
+      (dispatch qs)))
