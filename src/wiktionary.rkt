@@ -1,3 +1,4 @@
+#!/usr/bin/env racket
 #lang s-exp "wikipedia.rkt"
 
 (base-url "en.wiktionary.org")
