@@ -2,6 +2,11 @@
 
 (base-url "en.wiktionary.org")
 
+(define (process-article-name an)
+  (string-downcase an))
+
+(set-process-article-name! process-article-name)
+  
 (define qs (getenv "QUERY_STRING"))
 
 (when (not (false? qs))

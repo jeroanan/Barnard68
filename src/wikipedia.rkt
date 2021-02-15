@@ -3,9 +3,8 @@
 
 (provide default
          dispatch
-         search
-         get-article
          base-url
+         set-process-article-name!
          (all-from-out "barnard68.rkt")
          (all-from-out racket/bool))
 
@@ -70,6 +69,12 @@
   (gemini-title (format "~A" title))
   (display article-lines))
 
+(define (set-process-article-name! fn)
+  (set! process-article-name fn))
+
+(define (process-article-name an)
+  an)
+
 (define (search search-term)
   (define search-path (format "/w/api.php?action=opensearch&search=~A" search-term))
 
@@ -82,7 +87,7 @@
   (display-search-link)
 
   (for ([sr search-results])
-    (gemini-link (format "/~A?article=~A" (get-script-root) (uri-encode sr)) sr))
+    (gemini-link (format "/~A?article=~A" (get-script-root) (process-article-name (uri-encode sr))) sr))
   (display "\n\n")
   (gemini-link (format "/~A" (get-script-root)) "Search"))
 
