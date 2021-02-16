@@ -2,6 +2,7 @@
 (provide get-script-root
          get-jsexpr-from-url
          display-ok-header
+         internal-error
          gemini-title
          gemini-link
          (all-from-out racket/base))
@@ -18,6 +19,9 @@
 
 (define (display-ok-header)
   (display "20 text/gemini\r\n"))
+
+(define (internal-error msg)
+  (display (format "50 ~A\r\n" msg)))
 
 (define (gemini-title title-text)
   (display (format "# ~A\n\n" title-text)))

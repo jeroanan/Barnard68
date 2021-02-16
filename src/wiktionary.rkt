@@ -1,11 +1,5 @@
 #!/usr/bin/env racket
-#lang s-exp "wikipedia.rkt"
+#lang s-exp "wikimedia.rkt"
 
-(base-url "en.wiktionary.org")
-
-(define qs (getenv "QUERY_STRING"))
-
-(when (not (false? qs))
-  (if (eq? (string-length qs) 0)
-      (default "")
-      (dispatch qs)))
+(wikimedia-set-base-url "en.wiktionary.org")
+(wikimedia-begin)
