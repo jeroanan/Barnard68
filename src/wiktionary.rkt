@@ -1,5 +1,4 @@
 #!/usr/bin/env racket
-#lang s-exp "wikimedia.rkt"
+#lang reader "wikimedia.rkt"
 
-(wikimedia-set-base-url "en.wiktionary.org")
-(wikimedia-begin)
+wikimedia-base-url en.wiktionary.org
