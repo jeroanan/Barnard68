@@ -51,7 +51,7 @@
 (define channel-action-mappings (list
                                  (cons 'title set-channel-title)
                                  (cons 'description set-channel-description)
-                                 (cons 'link set-channel-link)
+                                 (cons 'link (λ (x) (set! channel-link x)))
                                  (cons 'generator set-channel-generator)
                                  (cons 'lastBuildDate set-channel-last-build-date)
                                  (cons 'copyright set-channel-copyright)
@@ -87,9 +87,9 @@
 
 (display-ok-header)
 (gemini-title channel-title)
-(gemini-link channel-link channel-link)
+(gemini-link channel-link (format "~A\n\n" channel-link))
 (for ([i items])
-  (displayln (format "=> ~A ~A" (item-title i) (item-link i)))
+  (displayln (format "=> ~A ~A" (item-link i) (item-title i)))
   (displayln (format "Published ~A" (item-pubdate i)))
   (displayln (format "~A\n\n" (item-description i))))
 
