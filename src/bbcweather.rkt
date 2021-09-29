@@ -64,8 +64,6 @@
 
          (define full-path (string-join path-elements "/" #:before-first "/"))
 
-         (displayln full-path)
-         
          (channel-field channel-title "")
          (channel-field channel-link "")
          (channel-field channel-description "")
@@ -75,7 +73,6 @@
 
          (struct item (title
                        description
-                       link
                        pubdate))
 
          (define-values (status headers response-port) (http-sendrecv rss-host full-path #:ssl? #t))
@@ -104,10 +101,9 @@
            (define gt (λ (fn x) (cdata->string (third (fn x)))))
            (define x (filter list? e))
            (define title-text (gt second x))
-           (define description-text (gt third x))
-           (define link (third (fourth x)))
-           (define pubdate (third (sixth x)))
-           (item title-text description-text link pubdate))
+           (define description-text (gt fourth x))
+           (define pubdate (third (fifth x)))
+           (item title-text description-text pubdate))
 
          (define (cdata->string c)
            (if (not (cdata? c))
@@ -128,8 +124,8 @@
          (gemini-title channel-title)
          (gemini-link channel-link (format "~A\n\n" channel-link))
          (for ([i items])
-           (displayln (format "=> ~A ~A" (item-link i) (item-title i)))
-           (displayln (format "Published ~A" (item-pubdate i)))
-           (displayln (format "~A\n\n" (item-description i))))
+           (displayln (format "## ~A" (item-title i)))           
+           (displayln (format "~A\n\n" (item-description i)))
+           (displayln (format "Published ~A\n\n" (item-pubdate i))))
 
          (displayln (format "\n\nweather content: ~A" channel-copyright))))))
