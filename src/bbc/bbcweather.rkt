@@ -20,13 +20,13 @@
      #'(module bbcweather racket
          
          (require racket/list
-                  racket/port
                   racket/string
                   net/http-client
                   xml
                   xml/path)
          
          (require "barnard68.rkt")
+         
          (define stx-lines (filter (λ (l) (> (string-length (string-trim l)) 0)) (string-split str "\n")))
          (define config-hash (make-hash))
          

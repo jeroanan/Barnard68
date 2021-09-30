@@ -1,4 +1,4 @@
 #!/usr/bin/env racket
-#lang reader "bbcnews.rkt"
+#lang reader "bbc/bbcnews.rkt"
 
 rss-path /news/rss.xml
