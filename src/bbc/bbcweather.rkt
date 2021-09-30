@@ -63,11 +63,9 @@
            (define link (gt third x))
            (define description-text (gt fourth x))
            (define pubdate (third (fifth x)))
-           (displayln link)
            (item title-text description-text "" pubdate))
 
          (define items (execute rss-host full-path channel-action-mappings parse-item))
-         (display items)
          (display-ok-header)
          (gemini-title channel-title)
          (gemini-link channel-link (format "~A\n\n" channel-link))
