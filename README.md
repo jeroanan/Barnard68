@@ -35,6 +35,13 @@ Note that since the bbcnews\* scripts just fetch and parse RSS feeds,
 the links that they present are merely http links to the BBC news
 webesite.
 
+bbcweather.rkt – Get the weather from the BBC. This repo includes two
+examples to get the three-day forecast and latest observatons from
+manchester. To get the weather for your location, copy/edit these files
+to contain your location code. You can get your location code by search
+for your location on the BBC weather website, and then copying the
+7-digit number from the end of the resulting URL.
+
 ## 2. How to use
 
 * Unless you’re running binary versions of the scripts (not really
